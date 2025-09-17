@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeTeen - Захист підлітків від deepfake-вірусів та кібербулінгу</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --secondary: #3a0ca3;
+            --accent: #f72585;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --success: #4cc9f0;
+            --warning: #f9c74f;
+            --danger: #f94144;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f9f9f9;
+            color: var(--dark);
+            line-height: 1.6;
+            scroll-behavior: smooth;
+        }
+        
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo span {
+            color: var(--accent);
+        }
+        
+        .nav-links {
+            display: flex;
+            list-style: none;
+            align-items: center;
+        }
+        
+        .nav-links li {
+            margin-left: 2rem;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-links a:hover, .nav-links a.active {
+            color: var(--accent);
+        }
+        
+        .btn {
+            display: inline-block;
+            padding: 0.8rem 1.5rem;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+   
+        .btn-outline {
+            background: transparent;
+            border: 2px solid white;
+        }
+        #register-btn:hover{
+            color:black;
+        }
+        .btn-outline:hover {
+            background: white;
+            color: var(--primary);
+        }
+        
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .auth-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-container.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .auth-form {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(-50px);
+            transition: all 0.3s ease;
+            position: relative;
+        }
+        
+        .auth-container.active .auth-form {
+            transform: translateY(0);
+        }
+        
+        .close-auth {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .auth-form h2 {
+            text-align: center;
+            margin-bottom: 1.5rem;
+            color: var(--primary);
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+        
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-switch {
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.9rem;
+        }
+        
+        .form-switch a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .page-section {
+            display: none;
+            padding: 3rem 0;
+            min-height: 80vh;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        #home {
+            padding: 5rem 0;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 800 400"><rect fill="%234361ee" width="800" height="400"/><path fill="%233a0ca3" fill-opacity="0.2" d="M0 192L26.7 202.7C53.3 213 107 235 160 234.7C213.3 235 267 213 320 192C373.3 171 427 149 480 149.3C533.3 149 587 171 640 186.7C693.3 203 747 213 773.3 218.7L800 224L800 401L773.3 401C746.7 401 693 401 640 401C586.7 401 533 401 480 401C426.7 401 373 401 320 401C266.7 401 213 401 160 401C106.7 401 53 401 27 401L0 401Z"></path></svg>') center/cover no-repeat;
+            color: white;
+            text-align: center;
+            display: block;
+        }
+        
+        .hero h1 {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        
+        .hero p {
+            font-size: 1.2rem;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .feature-card {
+            background-color: var(--light);
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .feature-card h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .section-title h2 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+        
+        .section-title p {
+            color: #666;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+        .download-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .download-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        
+        .download-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .download-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2rem;
+        }
+        
+        .download-card h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        
+        .download-card p {
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
+        }
+        
+        .download-features {
+            text-align: left;
+            margin-bottom: 1.5rem;
+        }
+        
+        .download-features li {
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+        }
+        
+        .download-features li i {
+            color: var(--success);
+            margin-right: 0.5rem;
+        }
+        .instructions-steps {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .instruction-step {
+            background-color: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        .step-number {
+            width: 40px;
+            height: 40px;
+            background-color: var(--accent);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+            font-weight: bold;
+        }
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .tech-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .tech-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+        }
+        
+        .tech-icon {
+            width: 60px;
+            height: 60px;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        
+        .tech-card h3 {
+            margin-bottom: 1rem;
+            color: var(--secondary);
+        }
+        .steps {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+        
+        .step {
+            flex: 1;
+            min-width: 250px;
+            text-align: center;
+            padding: 2rem;
+        }
+        .accordion {
+            margin-top: 2rem;
+        }
+        
+        .accordion-item {
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .accordion-header {
+            background-color: white;
+            padding: 1.5rem;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+        }
+        
+        .accordion-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background-color: white;
+        }
+        
+        .accordion-content.active {
+            max-height: 300px;
+            padding: 1.5rem;
+        }
+        .contact-form {
+            background: white;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            min-height: 150px;
+            resize: vertical;
+        }
+        footer {
+            background-color: var(--dark);
+            color: white;
+            padding: 3rem 0;
+            text-align: center;
+        }
+        
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            list-style: none;
+            margin: 2rem 0;
+        }
+        
+        .footer-links li {
+            margin: 0 1rem;
+        }
+        
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+        }
+        
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+        @media (max-width: 768px) {
+            .nav-links li:not(:last-child) {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .features-grid, .download-options, .tech-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+            }
+        }
+        .btn-chrome {
+            background-color: #4285F4;
+        }
+        
+        .btn-firefox {
+            background-color: #FF7139;
+        }
+        
+        .btn-edge {
+            background-color: #0078D7;
+        }
+        
+        .btn-android {
+            background-color: #3DDC84;
+            color: #000;
+        }
+        
+        .btn-ios {
+            background-color: #000;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--success);
+            color: white;
+            border-radius: 5px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateX(100%);
+            opacity: 0;
+            transition: all 0.3s ease;
+            z-index: 1000;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            right: -300px;
+            width: 300px;
+            height: 100%;
+            background: white;
+            z-index: 1001;
+            padding: 2rem;
+            box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+            transition: right 0.3s ease;
+        }
+        
+        .mobile-menu.active {
+            right: 0;
+        }
+        
+        .mobile-menu ul {
+            list-style: none;
+            margin-top: 2rem;
+        }
+        
+        .mobile-menu ul li {
+            margin-bottom: 1rem;
+        }
+        
+        .mobile-menu ul li a {
+            color: var(--dark);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .close-menu {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+            
+            .nav-links li:not(:last-child) {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification" id="notification">
+        <span id="notification-text"></span>
+    </div>
+    <div class="mobile-menu" id="mobile-menu">
+        <button class="close-menu" id="close-menu">&times;</button>
+        <div class="logo">Safe<span>Teen</span></div>
+        <ul>
+            <li><a href="#home" class="nav-link" data-section="home">Головна</a></li>
+            <li><a href="#about" class="nav-link" data-section="about">Про продукт</a></li>
+            <li><a href="#download" class="nav-link" data-section="download">Завантажити</a></li>
+            <li><a href="#parents" class="nav-link" data-section="parents">Для батьків</a></li>
+            <li><a href="#contact" class="nav-link" data-section="contact">Контакти</a></li>
+            <li><a href="#" id="mobile-login">Увійти</a></li>
+            <li><a href="#" id="mobile-register">Реєстрація</a></li>
+        </ul>
+    </div>
+    <header>
+        <div class="container">
+            <nav>
+                <div class="logo">Safe<span>Teen</span></div>
+                <ul class="nav-links">
+                    <li><a href="#home" class="nav-link active" data-section="home">Головна</a></li>
+                    <li><a href="#about" class="nav-link" data-section="about">Про продукт</a></li>
+                    <li><a href="#download" class="nav-link" data-section="download">Завантажити</a></li>
+                    <li><a href="#parents" class="nav-link" data-section="parents">Для батьків</a></li>
+                    <li><a href="#contact" class="nav-link" data-section="contact">Контакти</a></li>
+                    <li id="auth-buttons">
+                        <a href="#" class="btn btn-outline" id="login-btn">Увійти</a>
+                        <a href="#" class="btn" id="register-btn">Реєстрація</a>
+                    </li>
+                </ul>
+                <button class="mobile-menu-btn" id="mobile-menu-btn">
+                    <i class="fas fa-bars"></i>
+                </button>
+            </nav>
+        </div>
+    </header>
+    <div class="auth-container" id="login-container">
+        <div class="auth-form">
+            <button class="close-auth" id="close-login">&times;</button>
+            <h2>Вхід в акаунт</h2>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="login-email">Електронна пошта</label>
+                    <input type="email" id="login-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="login-password">Пароль</label>
+                    <input type="password" id="login-password" required>
+                </div>
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox"> Запам'ятати мене
+                    </label>
+                    <a href="#">Забули пароль?</a>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Увійти</button>
+            </form>
+            <div class="form-switch">
+                Ще не маєте акаунту? <a href="#" id="switch-to-register">Зареєструватися</a>
+            </div>
+        </div>
+    </div>
+    <div class="auth-container" id="register-container">
+        <div class="auth-form">
+            <button class="close-auth" id="close-register">&times;</button>
+            <h2>Створення акаунту</h2>
+            <form id="register-form">
+                <div class="form-group">
+                    <label for="register-name">Ім'я</label>
+                    <input type="text" id="register-name" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-email">Електронна пошта</label>
+                    <input type="email" id="register-email" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-password">Пароль</label>
+                    <input type="password" id="register-password" required>
+                </div>
+                <div class="form-group">
+                    <label for="register-confirm">Підтвердження пароля</label>
+                    <input type="password" id="register-confirm" required>
+                </div>
+                <div class="form-options">
+                    <label>
+                        <input type="checkbox" required> Я приймаю умови використання
+                    </label>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Зареєструватися</button>
+            </form>
+            <div class="form-switch">
+                Вже маєте акаунт? <a href="#" id="switch-to-login">Увійти</a>
+            </div>
+        </div>
+    </div>
+    <main>
+        <section id="home" class="page-section active">
+            <div class="container hero">
+                <h1>Захист підлітків від deepfake-вірусів та кібербулінгу</h1>
+                <p>AI-система раннього виявлення штучно створеного контенту, соціальних ботів та токсичних повідомлень у соціальних мережах</p>
+                <a href="#download" class="btn nav-link" data-section="download">Встановити безкоштовно</a>
+            </div>
+        </section>
+        <section id="about" class="page-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Як працює наша технологія</h2>
+                    <p>Дізнайтесь більше про передові алгоритми штучного інтелекту, що захищають підлітків</p>
+                </div>
+                
+                <div class="tech-grid">
+                    <div class="tech-card">
+                        <div class="tech-icon">CV</div>
+                        <h3>Computer Vision</h3>
+                        <p>Аналізуємо відео та зображення для виявлення артефактів генеративних моделей, аномалій у освітленні, невідповідностей у текстурах та інших ознак штучного походження контенту.</p>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <div class="tech-icon">NLP</div>
+                        <h3>Natural Language Processing</h3>
+                        <p>Використовуємо трансформерні моделі для аналізу текстового контенту, виявлення токсичних повідомлень, образ, маніпуляційних технік та ознак кібербулінгу.</p>
+                    </div>
+                    
+                    <div class="tech-card">
+                        <div class="tech-icon">BA</div>
+                        <h3>Behavioral Analysis</h3>
+                        <p>Моніторимо активність акаунтів для виявлення бот-поведінки, неестественних патернів взаємодії та координатованих кампаній поширення дезінформації.</p>
+                    </div>
+                </div>
+                
+                <div class="section-title" style="margin-top: 5rem;">
+                    <h2>Як ми захищаємо</h2>
+                    <p>Наша система працює в реальному часі, аналізуючи контент до його взаємодії з користувачем</p>
+                </div>
+                
+                <div class="steps">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Моніторинг</h3>
+                        <p>Постійно аналізуємо контент у популярних соціальних мережах та комунікаційних платформах</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Аналіз</h3>
+                        <p>Застосовуємо ансамбль ML-моделей для класифікації контенту за рівнем загрози</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Сповіщення</h3>
+                        <p>Надаємо зрозумілі попередження про потенційні загрози без блокування контенту</p>
+                    </div>
+                    
+                    <div class="step">
+                        <div class="step-number">4</div>
+                        <h3>Навчання</h3>
+                        <p>Пропонуємо освітні матеріали для розвитку кіберграмотності та критичного мислення</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="download" class="page-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Доступні версії</h2>
+                    <p>SafeTeen доступний для всіх популярних платформ та браузерів</p>
+                </div>
+                
+                <div class="download-options">
+                    <div class="download-card">
+                        <div class="download-icon">
+                            <i class="fab fa-chrome"></i>
+                        </div>
+                        <h3>Браузерне розширення</h3>
+                        <p>Захищайте себе під час перегляду соціальних мереж у браузері</p>
+                        
+                        <ul class="download-features">
+                            <li><i class="fas fa-check-circle"></i> Підтримка Chrome, Firefox, Edge</li>
+                            <li><i class="fas fa-check-circle"></i> Синхронізація з вашим акаунтом</li>
+                            <li><i class="fas fa-check-circle"></i> Захист у реальному часі</li>
+                            <li><i class="fas fa-check-circle"></i> Сповіщення про загрози</li>
+                        </ul>
+                        
+                        <div class="download-buttons">
+                            <a href="#" class="btn btn-chrome" data-browser="chrome"><i class="fab fa-chrome"></i> Chrome</a>
+                            <a href="#" class="btn btn-firefox" data-browser="firefox"><i class="fab fa-firefox-browser"></i> Firefox</a>
+                            <a href="#" class="btn btn-edge" data-browser="edge"><i class="fab fa-edge"></i> Edge</a>
+                        </div>
+                    </div>
+                    
+                    <div class="download-card">
+                        <div class="download-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <h3>Мобільний додаток</h3>
+                        <p>Отримуйте захист на вашому смартфоні чи планшеті</p>
+                        
+                        <ul class="download-features">
+                            <li><i class="fas fa-check-circle"></i> Підтримка Android та iOS</li>
+                            <li><i class="fas fa-check-circle"></i> Захист у додатках соціальних мереж</li>
+                            <li><i class="fas fa-check-circle"></i> Синхронізація з браузерним розширенням</li>
+                            <li><i class="fas fa-check-circle"></i> Родинний контроль</li>
+                        </ul>
+                        
+                        <div class="download-buttons">
+                            <a href="#" class="btn btn-android" data-platform="android"><i class="fab fa-android"></i> Android</a>
+                            <a href="#" class="btn btn-ios" data-platform="ios"><i class="fab fa-apple"></i> iOS</a>
+                        </div>
+                    </div>
+                    
+                    <div class="download-card">
+                        <div class="download-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <h3>Десктопна версія</h3>
+                        <p>Повноцінний захист для вашого комп'ютера</p>
+                        
+                        <ul class="download-features">
+                            <li><i class="fas fa-check-circle"></i> Підтримка Windows, macOS, Linux</li>
+                            <li><i class="fas fa-check-circle"></i> Глибока інтеграція з системою</li>
+                            <li><i class="fas fa-check-circle"></i> Мережевий захист</li>
+                            <li><i class="fas fa-check-circle"></i> Розширені налаштування</li>
+                        </ul>
+                        
+                        <div class="download-buttons">
+                            <a href="#" class="btn" data-platform="windows"><i class="fab fa-windows"></i> Windows</a>
+                            <a href="#" class="btn" data-platform="macos"><i class="fab fa-apple"></i> macOS</a>
+                            <a href="#" class="btn" data-platform="linux"><i class="fab fa-linux"></i> Linux</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="section-title" style="margin-top: 5rem;">
+                    <h2>Як встановити браузерне розширення</h2>
+                    <p>Процес встановлення займає лише кілька хвилин</p>
+                </div>
+                
+                <div class="instructions-steps">
+                    <div class="instruction-step">
+                        <div class="step-number">1</div>
+                        <h3>Завантажте розширення</h3>
+                        <p>Натисніть кнопку для вашого браузера вище та завантажте файл розширення</p>
+                    </div>
+                    
+                    <div class="instruction-step">
+                        <div class="step-number">2</div>
+                        <h3>Встановіть у браузер</h3>
+                        <p>Перейдіть до розділу розширень у вашому браузері та додайте завантажений файл</p>
+                    </div>
+                    
+                    <div class="instruction-step">
+                        <div class="step-number">3</div>
+                        <h3>Увійдіть в акаунт</h3>
+                        <p>Введіть дані вашого облікового запису SafeTeen для синхронізації</p>
+                    </div>
+                    
+                    <div class="instruction-step">
+                        <div class="step-number">4</div>
+                        <h3>Налаштуйте захист</h3>
+                        <p>Оберіть рівень захисту та типи контенту, які потрібно блокувати</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="parents" class="page-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Для батьків</h2>
+                    <p>Інструменти та ресурси для забезпечення безпеки ваших дітей в інтернеті</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-shield-alt"></i></div>
+                        <h3>Родинний контроль</h3>
+                        <p>Налаштуйте параметри безпеки для кожного члена сім'ї, встановіть обмеження та отримуйте звіти про активність</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-chart-line"></i></div>
+                        <h3>Моніторинг активності</h3>
+                        <p>Отримуйте детальні звіти про онлайн-активність ваших дітей та отримуйте сповіщення про потенційні загрози</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-graduation-cap"></i></div>
+                        <h3>Освітні ресурси</h3>
+                        <p>Доступ до матеріалів, які допоможуть вам навчити дітей безпечній поведінці в інтернеті</p>
+                    </div>
+                </div>
+                
+                <div class="section-title" style="margin-top: 5rem;">
+                    <h2>Поширені запитання батьків</h2>
+                </div>
+                
+                <div class="accordion">
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            Як мені переконатися, що моя дитина в безпеці в соціальних мережах?
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p>SafeTeen пропонує батькам зручний інструмент для моніторингу активності дітей у соціальних мережах без порушення їхньої приватності. Ви отримуєте сповіщення лише про потенційно небезпечний контент або контакти, що дозволяє дітям зберігати автономність, а вам дає впевненість у їхній безпеці.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            Чи можу я бачити повідомлення моєї дитини?
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p>SafeTeen не надає доступу до особистих повідомлень вашої дитини, щоб зберегти її право на приватність. Замість цього система аналізує контент на наявність ознак небезпеки і сповіщає вас лише у випадку виявлення потенційних загроз, таких кібербулінг, спроби зловмисного впливу чи шкідливий контент.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item">
+                        <div class="accordion-header">
+                            Як налаштувати рівень захисту для дитини різного віку?
+                            <span>+</span>
+                        </div>
+                        <div class="accordion-content">
+                            <p>У налаштуваннях SafeTeen ви можете обрати профіль, що відповідає віку вашої дитини. Для молодших дітей система пропонує суворіший фільтр, тоді як для підлітків старшого віку можна активувати режим з меншою кількістю обмежень, але з моніторингом найнебезпечніших загроз.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <section id="contact" class="page-section">
+            <div class="container">
+                <div class="section-title">
+                    <h2>Зв'яжіться з нами</h2>
+                    <p>Маєте запитання або потребуєте допомоги? Ми завжди готові допомогти</p>
+                </div>
+                
+                <div class="contact-form">
+                    <form id="contact-form">
+                        <div class="form-group">
+                            <label for="contact-name">Ваше ім'я</label>
+                            <input type="text" id="contact-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-email">Електронна пошта</label>
+                            <input type="email" id="contact-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-subject">Тема звернення</label>
+                            <input type="text" id="contact-subject" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="contact-message">Повідомлення</label>
+                            <textarea id="contact-message" required></textarea>
+                        </div>
+                        <button type="submit" class="btn" style="width: 100%;">Надіслати повідомлення</button>
+                    </form>
+                </div>
+                
+                <div class="section-title" style="margin-top: 5rem;">
+                    <h2>Інші способи зв'язку</h2>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-envelope"></i></div>
+                        <h3>Електронна пошта</h3>
+                        <p>support@safeteen.example.com</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-phone"></i></div>
+                        <h3>Телефон</h3>
+                        <p>+380 (XX) XXX-XX-XX</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon"><i class="fas fa-clock"></i></div>
+                        <h3>Графік роботи</h3>
+                        <p>Пн-Пт: 9:00-18:00<br>Сб-Нд: вихідний</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <div class="container">
+            <div class="logo">Safe<span>Teen</span></div>
+            <p>AI-система захисту підлітків від кібербулінгу та дезінформації</p>
+            <ul class="footer-links">
+                <li><a href="#" class="nav-link" data-section="home">Головна</a></li>
+                <li><a href="#" class="nav-link" data-section="about">Про продукт</a></li>
+                <li><a href="#" class="nav-link" data-section="download">Завантажити</a></li>
+                <li><a href="#" class="nav-link" data-section="parents">Для батьків</a></li>
+                <li><a href="#" class="nav-link" data-section="contact">Контакти</a></li>
+            </ul>
+            
+            <p>&copy; 2025 SafeTeen. Всі права захищені</p>
+        </div>
+    </footer>
+
+    <script>
+        function showNotification(message, isSuccess = true) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notification-text');
+            
+            notificationText.textContent = message;
+            notification.style.background = isSuccess ? 'var(--success)' : 'var(--danger)';
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+        function simulateDownload(type, name) {
+            showNotification(`Завантаження ${name} розпочато...`);
+            setTimeout(() => {
+                showNotification(`${name} успішно завантажено!`);
+            }, 2000);
+        }
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                const targetSection = this.getAttribute('data-section');
+                document.querySelectorAll('.page-section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                document.getElementById(targetSection).classList.add('active');
+                document.querySelectorAll('.nav-link').forEach(navLink => {
+                    navLink.classList.remove('active');
+                });
+                this.classList.add('active');
+                document.getElementById('mobile-menu').classList.remove('active');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+        document.querySelectorAll('.download-buttons a').forEach(button => {
+            button.addEventListener('click', function(e) {
+                e.preventDefault();          
+                const browser = this.getAttribute('data-browser');
+                const platform = this.getAttribute('data-platform');
+                const text = this.textContent.trim();
+                if (browser) {
+                    simulateDownload('browser', text);
+                } else if (platform) {
+                    simulateDownload('platform', text);
+                }
+            });
+        });
+        document.querySelectorAll('.accordion-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const content = header.nextElementSibling;
+                content.classList.toggle('active');
+                header.querySelector('span').textContent = content.classList.contains('active') ? '-' : '+';
+            });
+        });
+        function detectPlatform() {
+            const userAgent = navigator.userAgent;
+            if (userAgent.indexOf('Chrome') > -1) {
+                highlightButton('.btn-chrome');
+            } else if (userAgent.indexOf('Firefox') > -1) {
+                highlightButton('.btn-firefox');
+            } else if (userAgent.indexOf('Edg') > -1) {
+                highlightButton('.btn-edge');
+            }
+            if (/Android/i.test(userAgent)) {
+                highlightButton('.btn-android');
+            } else if (/iPhone|iPad|iPod/i.test(userAgent)) {
+                highlightButton('.btn-ios');
+            }
+        }
+        function highlightButton(selector) {
+            const button = document.querySelector(selector);
+            if (button) {
+                button.style.transform = 'scale(1.05)';
+                button.style.boxShadow = '0 5px 15px rgba(0, 0, 0, 0.2)';
+            }
+        }
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.add('active');
+        });
+        document.getElementById('close-menu').addEventListener('click', () => {
+            document.getElementById('mobile-menu').classList.remove('active');
+        });
+        document.getElementById('login-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-container').classList.add('active');
+        });
+        document.getElementById('register-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('register-container').classList.add('active');
+        });
+        document.getElementById('mobile-login').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-container').classList.add('active');
+            document.getElementById('mobile-menu').classList.remove('active');
+        });
+        document.getElementById('mobile-register').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('register-container').classList.add('active');
+            document.getElementById('mobile-menu').classList.remove('active');
+        });
+        document.getElementById('close-login').addEventListener('click', () => {
+            document.getElementById('login-container').classList.remove('active');
+        });
+        document.getElementById('close-register').addEventListener('click', () => {
+            document.getElementById('register-container').classList.remove('active');
+        });
+        document.getElementById('switch-to-register').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('login-container').classList.remove('active');
+            document.getElementById('register-container').classList.add('active');
+        });
+        document.getElementById('switch-to-login').addEventListener('click', (e) => {
+            e.preventDefault();
+            document.getElementById('register-container').classList.remove('active');
+            document.getElementById('login-container').classList.add('active');
+        });
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showNotification('Вхід успішний!');
+            document.getElementById('login-container').classList.remove('active');
+        });
+        document.getElementById('register-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showNotification('Реєстрація успішна!');
+            document.getElementById('register-container').classList.remove('active');
+        });
+        document.getElementById('contact-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showNotification('Повідомлення відправлено! Ми зв\'яжемося з вами найближчим часом.');
+            document.getElementById('contact-form').reset();
+        });
+        document.addEventListener('DOMContentLoaded', detectPlatform);
+    </script>
+</body>
+</html>
